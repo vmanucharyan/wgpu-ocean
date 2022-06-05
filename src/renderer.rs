@@ -236,7 +236,7 @@ impl Renderer {
       size: ocean_size,
       wind_speed: 10.0,
       wind_direction: -20.0,
-      swell: 0.4,
+      swell: 0.3,
     };
 
     let derivatives_sampler = device.create_sampler(&wgpu::SamplerDescriptor {

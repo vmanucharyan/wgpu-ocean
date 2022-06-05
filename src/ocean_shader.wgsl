@@ -37,8 +37,8 @@ var t_foam: texture_2d<f32>;
 
 let SKY_COLOR = vec3<f32>(0.5, 0.5, 0.5);
 let OCEAN_COLOR = vec3<f32>(0.04, 0.20, 0.34);
-let SUN_DIR = vec3<f32>(-1.0, 1.0, 1.0);
-let LOD_SCALE = 7.3;
+let SUN_DIR = vec3<f32>(1.0, 1.0, 1.0);
+let LOD_SCALE = 15.0;
 let LENGTH_SCALE = vec3<f32>(500.0, 85.0, 10.0);
 
 let INFINITE = 100000.0;
@@ -192,14 +192,14 @@ fn fs_main(in: VertexOutput) -> [[location(0)]] vec4<f32> {
     let diffuse = clamp(dot(normal.xyz, normalize(SUN_DIR)), 0.0, 1.0);
     let water = (1.0 - fresnel_factor) * OCEAN_COLOR * SKY_COLOR * diffuse;
 
-    let fog_range = vec2<f32>(150.0, 1500.0);
+    let fog_range = vec2<f32>(300.0, 1000.0);
     let fog_factor = clamp((distance - fog_range.x) / (fog_range.y - fog_range.x), 0.0, 1.0);
     // color = mix(color, vec3<f32>(1.0), turbulence) + fog_factor;
 
     let foam_color = textureSample(t_foam, s_derivatives, in.uv_1);
     let foam = turbulence;
 
-    let color = sky + water + vec3<f32>(fog_factor);
+    let color = sky + water + fog_factor;
 
-    return vec4<f32>(hdr(color, 0.35), 1.0);
+    return vec4<f32>(hdr(color, 0.40), 1.0);
 }
