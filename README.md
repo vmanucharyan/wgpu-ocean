@@ -1,3 +1,3 @@
-# Ocean waves simulation using rust and wgpu
+Ocean waves simulation using rust and wgpu
 
 ![Screenshot](screen.png)
