@@ -1,0 +1,21 @@
+[package]
+name = "wgpu-compute"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+wgpu = "0.12.0"
+pollster = "0.2.5"
+rand = "0.8.5"
+bytemuck = { version = "1.9.1", features = ["derive"] }
+winit = { git = "https://github.com/rust-windowing/winit" }
+env_logger = "0.9.0"
+cgmath = "0.18.0"
+instant = "0.1.11"
+
+[dependencies.image]
+version = "0.24"
+default-features = false
+features = ["png", "jpeg", "webp"]
