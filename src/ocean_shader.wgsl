@@ -199,7 +199,7 @@ fn fs_main(in: VertexOutput) -> [[location(0)]] vec4<f32> {
     let foam_color = textureSample(t_foam, s_derivatives, in.uv_1);
     let foam = turbulence;
 
-    let color = sky + water + foam + vec3<f32>(0.0);
+    let color = sky + water + vec3<f32>(fog_factor);
 
-    return vec4<f32>(hdr(color, 0.45), 1.0);
+    return vec4<f32>(hdr(color, 0.35), 1.0);
 }
