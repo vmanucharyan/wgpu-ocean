@@ -1,5 +1,5 @@
 [package]
-name = "wgpu-compute"
+name = "wgpu_ocean"
 version = "0.1.0"
 edition = "2021"
 

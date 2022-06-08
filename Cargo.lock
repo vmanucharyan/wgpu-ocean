@@ -1438,21 +1438,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "wgpu-compute"
-version = "0.1.0"
-dependencies = [
- "bytemuck",
- "cgmath",
- "env_logger",
- "image",
- "instant",
- "pollster",
- "rand",
- "wgpu",
- "winit",
-]
-
-[[package]]
 name = "wgpu-core"
 version = "0.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1520,6 +1505,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "549533d9e1cdd4b4cda7718d33ff500fc4c34b5467b71d76b547ae0324f3b2a2"
 dependencies = [
  "bitflags",
+]
+
+[[package]]
+name = "wgpu_ocean"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "cgmath",
+ "env_logger",
+ "image",
+ "instant",
+ "pollster",
+ "rand",
+ "wgpu",
+ "winit",
 ]
 
 [[package]]

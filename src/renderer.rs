@@ -107,7 +107,7 @@ impl Renderer {
 
     let config = wgpu::SurfaceConfiguration {
       usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-      format: surface.get_preferred_format(&adapter).unwrap(),
+      format: wgpu::TextureFormat::Bgra8Unorm,
       width: size.width,
       height: size.height,
       present_mode: wgpu::PresentMode::Fifo,
@@ -234,8 +234,8 @@ impl Renderer {
 
     let ocean_params = OceanCascadeParameters {
       size: ocean_size,
-      wind_speed: 10.0,
-      wind_direction: -20.0,
+      wind_speed: 6.0,
+      wind_direction: 180.0,
       swell: 0.3,
     };
 
@@ -595,9 +595,9 @@ impl Renderer {
           resolve_target: Some(&view),
           ops: wgpu::Operations {
             load: wgpu::LoadOp::Clear(wgpu::Color {
-              r: 0.5,
-              g: 0.5,
-              b: 0.5,
+              r: 1.0,
+              g: 1.0,
+              b: 1.0,
               a: 1.0,
             }),
             store: true,

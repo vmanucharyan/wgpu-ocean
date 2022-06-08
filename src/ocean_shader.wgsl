@@ -35,12 +35,18 @@ var t_derivatives_2: texture_2d<f32>;
 [[group(1), binding(7)]]
 var t_foam: texture_2d<f32>;
 
-let SKY_COLOR = vec3<f32>(0.5, 0.5, 0.5);
-let OCEAN_COLOR = vec3<f32>(0.04, 0.20, 0.34);
-let SUN_DIR = vec3<f32>(1.0, 1.0, 1.0);
+let SKY_COLOR = vec3<f32>(0.9, 0.9, 0.9);
+
+let OCEAN_BASE_COLOR = vec3<f32>(0.0, 0.10, 0.18);
+let OCEAN_WATER_COLOR = vec3<f32>(0.48, 0.54, 0.36);
+
+let OCEAN_COLOR = vec3<f32>(0.0, 0.38, 0.53);
+// let OCEAN_COLOR = vec3<f32>(0.0, 0.0, 1.0);
+let SUN_DIR = vec3<f32>(-1.0, 1.0, 1.0);
 let LOD_SCALE = 15.0;
 let LENGTH_SCALE = vec3<f32>(500.0, 85.0, 10.0);
 
+let PI: f32 = 3.14159265358979323846264338;
 let INFINITE = 100000.0;
 
 struct VertexInput {
@@ -104,7 +110,7 @@ fn vs_main(model: VertexInput) -> VertexOutput {
     let lod_c2 = min(LOD_SCALE * LENGTH_SCALE.z / view_dist, 1.0);
 
     let near = view_dist < 200.0;
-    let mid = view_dist < 1000.0;
+    let mid = view_dist < 2000.0;
 
     let ocean_uv_0 = world_pos.xz / LENGTH_SCALE.x;
     let ocean_uv_1 = world_pos.xz / LENGTH_SCALE.y;
@@ -154,11 +160,43 @@ fn hdr(color: vec3<f32>, exposure: f32) -> vec3<f32> {
     return 1.0 - exp(-color * exposure);
 }
 
+fn diffuse(n: vec3<f32>, l: vec3<f32>, p: f32) -> f32 {
+    return pow(dot(n, l) * 0.4 + 0.6, p);
+}
+
+fn specular(n: vec3<f32>, l: vec3<f32>, e: vec3<f32>, s: f32) -> f32 {
+    let nrm = (s + 8.0) / (PI * 8.0);
+    return pow(max(dot(reflect(e, n), l), 0.0), s) * nrm;
+}
+
+fn getSkyColor(e: vec3<f32>) -> vec3<f32> {
+    let ey = (max(e.y, 0.0) * 0.8 + 0.2) * 0.8;
+    return vec3<f32>(pow(1.0 - ey, 2.0), 1.0 - ey, 0.6 + (1.0 - ey) * 0.4) * 1.1;
+}
+
+fn getSeaColor(p: vec3<f32>, n: vec3<f32>, l: vec3<f32>, eye: vec3<f32>, dist: vec3<f32>) -> vec3<f32> {  
+    var fresnel_factor = dot(n, -eye);
+    fresnel_factor = max(fresnel_factor, 0.0);
+    fresnel_factor = 1.0 - fresnel_factor;
+    fresnel_factor = pow(fresnel_factor, 5.0) * 0.5;
+
+    let reflected = SKY_COLOR;
+    let refracted = OCEAN_BASE_COLOR + diffuse(n, l, 80.0) * OCEAN_WATER_COLOR * 0.12;
+
+    var color = (1.0 - fresnel_factor) * refracted + fresnel_factor * reflected;
+
+    let atten = max(1.0 - dot(dist, dist) * 0.00001, 0.0);
+    color = color + OCEAN_WATER_COLOR * (p.y - 0.1) * 0.04 * atten;
+    color = color + vec3<f32>(1.0, 1.0, 1.0) * 0.2 * specular(n,l,eye,180.0);
+
+    return color;
+}
+
 [[stage(fragment)]]
 fn fs_main(in: VertexOutput) -> [[location(0)]] vec4<f32> {
     let distance = abs(length(camera.pos - in.world_pos));
     let near = distance < 300.0;
-    let mid = distance < 1500.0;
+    let mid = distance < 2000.0;
 
     let d0 = textureSample(t_derivatives_0, s_derivatives, in.uv_0);
     let d1 = textureSample(t_derivatives_1, s_derivatives, in.uv_1);
@@ -183,23 +221,14 @@ fn fs_main(in: VertexOutput) -> [[location(0)]] vec4<f32> {
     var slope = vec2<f32>(d.x / (1.0 + d.z), d.y / (1.0 + d.w));
     var normal = normalize(vec3<f32>(-slope.x, 1.0, -slope.y));
 
-    var fresnel_factor = dot(normal.xyz, in.view_vector);
-    fresnel_factor = max(fresnel_factor, 0.0);
-    fresnel_factor = 1.0 - fresnel_factor;
-    fresnel_factor = pow(fresnel_factor, 5.0);
-
-    let sky = fresnel_factor * SKY_COLOR;
-    let diffuse = clamp(dot(normal.xyz, normalize(SUN_DIR)), 0.0, 1.0);
-    let water = (1.0 - fresnel_factor) * OCEAN_COLOR * SKY_COLOR * diffuse;
-
-    let fog_range = vec2<f32>(300.0, 1000.0);
+    let fog_range = vec2<f32>(200.0, 10000.0);
     let fog_factor = clamp((distance - fog_range.x) / (fog_range.y - fog_range.x), 0.0, 1.0);
-    // color = mix(color, vec3<f32>(1.0), turbulence) + fog_factor;
 
     let foam_color = textureSample(t_foam, s_derivatives, in.uv_1);
     let foam = turbulence;
 
-    let color = sky + water + fog_factor;
+    let light = normalize(SUN_DIR);
+    let color = getSeaColor(in.world_pos, normal, light, normalize(in.world_pos - camera.pos), camera.pos - in.world_pos);
 
-    return vec4<f32>(hdr(color, 0.40), 1.0);
+    return vec4<f32>(color + fog_factor, 1.0);
 }

@@ -7,15 +7,15 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug executable 'wgpu-compute'",
+      "name": "Debug executable 'wgpu_ocean'",
       "cargo": {
         "args": [
           "build",
-          "--bin=wgpu-compute",
-          "--package=wgpu-compute"
+          "--bin=wgpu_ocean",
+          "--package=wgpu_ocean"
         ],
         "filter": {
-          "name": "wgpu-compute",
+          "name": "wgpu_ocean",
           "kind": "bin"
         }
       },
@@ -25,16 +25,16 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug unit tests in executable 'wgpu-compute'",
+      "name": "Debug unit tests in executable 'wgpu_ocean'",
       "cargo": {
         "args": [
           "test",
           "--no-run",
-          "--bin=wgpu-compute",
-          "--package=wgpu-compute"
+          "--bin=wgpu_ocean",
+          "--package=wgpu_ocean"
         ],
         "filter": {
-          "name": "wgpu-compute",
+          "name": "wgpu_ocean",
           "kind": "bin"
         }
       },
