@@ -234,7 +234,7 @@ impl Renderer {
 
     let ocean_params = OceanCascadeParameters {
       size: ocean_size,
-      wind_speed: 6.0,
+      wind_speed: 10.0,
       wind_direction: 180.0,
       swell: 0.3,
     };

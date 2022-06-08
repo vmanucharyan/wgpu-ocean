@@ -187,7 +187,7 @@ fn getSeaColor(p: vec3<f32>, n: vec3<f32>, l: vec3<f32>, eye: vec3<f32>, dist: v
 
     let atten = max(1.0 - dot(dist, dist) * 0.00001, 0.0);
     color = color + OCEAN_WATER_COLOR * (p.y - 0.1) * 0.04 * atten;
-    color = color + vec3<f32>(1.0, 1.0, 1.0) * 0.2 * specular(n,l,eye,180.0);
+    color = color + vec3<f32>(1.0, 1.0, 1.0) * 0.05 * specular(n,l,eye,1200.0);
 
     return color;
 }
@@ -230,5 +230,5 @@ fn fs_main(in: VertexOutput) -> [[location(0)]] vec4<f32> {
     let light = normalize(SUN_DIR);
     let color = getSeaColor(in.world_pos, normal, light, normalize(in.world_pos - camera.pos), camera.pos - in.world_pos);
 
-    return vec4<f32>(color + fog_factor, 1.0);
+    return vec4<f32>(color + fog_factor + foam, 1.0);
 }
